@@ -48,14 +48,14 @@ def get_destination(id):
         'created_at': str(row[5])
     })
 
-# Create destination
+# Create destination usando stored procedure
 @destinations_bp.route('/destinations', methods=['POST'])
 def create_destination():
     data = request.get_json()
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO destinations (name, country, notes, status) VALUES (%s, %s, %s, %s) RETURNING *;",
+        "SELECT * FROM add_destination(%s, %s, %s, %s);",
         (data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'))
     )
     row = cur.fetchone()
@@ -72,15 +72,15 @@ def create_destination():
         'created_at': str(row[5])
     }), 201
 
-# Update destination
+# Update destination usando stored procedure
 @destinations_bp.route('/destinations/<int:id>', methods=['PUT'])
 def update_destination(id):
     data = request.get_json()
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "UPDATE destinations SET name=%s, country=%s, notes=%s, status=%s WHERE id=%s RETURNING *;",
-        (data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'), id)
+        "SELECT * FROM update_destination(%s, %s, %s, %s, %s);",
+        (id, data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'))
     )
     row = cur.fetchone()
     conn.commit()
@@ -99,20 +99,15 @@ def update_destination(id):
         'created_at': str(row[5])
     })
 
-# Delete destination
+# Delete destination usando stored procedure
 @destinations_bp.route('/destinations/<int:id>', methods=['DELETE'])
 def delete_destination(id):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("DELETE FROM destinations WHERE id=%s RETURNING id;", (id,))
-    row = cur.fetchone()
+    cur.execute("SELECT delete_destination(%s);", (id,))
     conn.commit()
     cur.close()
     conn.close()
-
-    if row is None:
-        return jsonify({'error': 'Destination not found'}), 404
-
     return jsonify({'message': 'Destination deleted'})
 
 # Get ISS location + nearby destinations
