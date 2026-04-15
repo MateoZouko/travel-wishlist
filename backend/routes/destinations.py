@@ -140,14 +140,3 @@ def delete_destination(id):
     cur.close()
     conn.close()
     return jsonify({'message': 'Destination deleted'})
-
-# Get ISS position
-@destinations_bp.route('/iss', methods=['GET'])
-def get_iss():
-    response = requests.get('http://api.open-notify.org/iss-now.json')
-    data = response.json()
-    return jsonify({
-        'latitude': float(data['iss_position']['latitude']),
-        'longitude': float(data['iss_position']['longitude']),
-        'timestamp': data['timestamp']
-    })
