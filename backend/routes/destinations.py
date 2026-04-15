@@ -4,6 +4,20 @@ from database import get_connection
 
 destinations_bp = Blueprint('destinations', __name__)
 
+def enrich_with_country_data(country_name: str):
+    try:
+        res = requests.get(f'https://restcountries.com/v3.1/name/{country_name}', timeout=5)
+        if res.status_code == 200:
+            data = res.json()[0]
+            capital = data.get('capital', ['N/A'])[0]
+            currencies = data.get('currencies', {})
+            currency = list(currencies.keys())[0] if currencies else 'N/A'
+            flag_url = data.get('flags', {}).get('png', '')
+            return capital, currency, flag_url
+    except Exception:
+        pass
+    return 'N/A', 'N/A', ''
+
 # Get all destinations
 @destinations_bp.route('/destinations', methods=['GET'])
 def get_destinations():
@@ -22,7 +36,10 @@ def get_destinations():
             'country': row[2],
             'notes': row[3],
             'status': row[4],
-            'created_at': str(row[5])
+            'created_at': str(row[5]),
+            'capital': row[6],
+            'currency': row[7],
+            'flag_url': row[8]
         })
     return jsonify(destinations)
 
@@ -45,18 +62,23 @@ def get_destination(id):
         'country': row[2],
         'notes': row[3],
         'status': row[4],
-        'created_at': str(row[5])
+        'created_at': str(row[5]),
+        'capital': row[6],
+        'currency': row[7],
+        'flag_url': row[8]
     })
 
-# Create destination usando stored procedure
+# Create destination usando stored procedure + RestCountries
 @destinations_bp.route('/destinations', methods=['POST'])
 def create_destination():
     data = request.get_json()
+    capital, currency, flag_url = enrich_with_country_data(data['country'])
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "SELECT * FROM add_destination(%s, %s, %s, %s);",
-        (data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'))
+        """INSERT INTO destinations (name, country, notes, status, capital, currency, flag_url)
+           VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING *;""",
+        (data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'), capital, currency, flag_url)
     )
     row = cur.fetchone()
     conn.commit()
@@ -69,18 +91,24 @@ def create_destination():
         'country': row[2],
         'notes': row[3],
         'status': row[4],
-        'created_at': str(row[5])
+        'created_at': str(row[5]),
+        'capital': row[6],
+        'currency': row[7],
+        'flag_url': row[8]
     }), 201
 
-# Update destination usando stored procedure
+# Update destination
 @destinations_bp.route('/destinations/<int:id>', methods=['PUT'])
 def update_destination(id):
     data = request.get_json()
+    capital, currency, flag_url = enrich_with_country_data(data['country'])
     conn = get_connection()
     cur = conn.cursor()
     cur.execute(
-        "SELECT * FROM update_destination(%s, %s, %s, %s, %s);",
-        (id, data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'))
+        """UPDATE destinations 
+           SET name=%s, country=%s, notes=%s, status=%s, capital=%s, currency=%s, flag_url=%s 
+           WHERE id=%s RETURNING *;""",
+        (data['name'], data['country'], data.get('notes', ''), data.get('status', 'wishlist'), capital, currency, flag_url, id)
     )
     row = cur.fetchone()
     conn.commit()
@@ -96,10 +124,13 @@ def update_destination(id):
         'country': row[2],
         'notes': row[3],
         'status': row[4],
-        'created_at': str(row[5])
+        'created_at': str(row[5]),
+        'capital': row[6],
+        'currency': row[7],
+        'flag_url': row[8]
     })
 
-# Delete destination usando stored procedure
+# Delete destination
 @destinations_bp.route('/destinations/<int:id>', methods=['DELETE'])
 def delete_destination(id):
     conn = get_connection()
@@ -110,7 +141,7 @@ def delete_destination(id):
     conn.close()
     return jsonify({'message': 'Destination deleted'})
 
-# Get ISS location + nearby destinations
+# Get ISS position
 @destinations_bp.route('/iss', methods=['GET'])
 def get_iss():
     response = requests.get('http://api.open-notify.org/iss-now.json')
