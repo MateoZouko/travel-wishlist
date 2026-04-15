@@ -23,7 +23,10 @@ def init_db():
             country VARCHAR(100) NOT NULL,
             notes TEXT,
             status VARCHAR(20) DEFAULT 'wishlist',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            capital VARCHAR(100),
+            currency VARCHAR(10),
+            flag_url TEXT
         );
     """)
     conn.commit()
