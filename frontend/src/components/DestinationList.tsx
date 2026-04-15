@@ -11,20 +11,33 @@ const DestinationList: React.FC = () => {
 
   return (
     <div>
-      <h2>My Destinations</h2>
-      {destinations.length === 0 && <p>No destinations yet. Add one!</p>}
+      {destinations.length === 0 && <p style={{ color: '#888' }}>No destinations yet. Add one above!</p>}
       {destinations.map(dest => (
-        <div key={dest.id} style={{ border: '1px solid #ccc', padding: '12px', marginBottom: '8px', borderRadius: '4px' }}>
+        <div key={dest.id} className="destination-card">
           {editing?.id === dest.id ? (
             <DestinationForm existing={dest} onDone={() => setEditing(null)} />
           ) : (
             <>
-              <h3>{dest.name}, {dest.country}</h3>
-              <p>Status: <strong>{dest.status}</strong></p>
-              {dest.notes && <p>Notes: {dest.notes}</p>}
-              <p style={{ fontSize: '12px', color: '#888' }}>Added: {new Date(dest.created_at).toLocaleDateString()}</p>
-              <button onClick={() => setEditing(dest)}>Edit</button>
-              <button onClick={() => deleteDestination(dest.id)} style={{ marginLeft: '8px', color: 'red' }}>Delete</button>
+              <div className="card-header">
+                {dest.flag_url && (
+                  <img src={dest.flag_url} alt={`${dest.country} flag`} />
+                )}
+                <h3>{dest.name}, {dest.country}</h3>
+              </div>
+              {(dest.capital || dest.currency) && (
+                <p className="card-meta">
+                  {dest.capital && <>Capital: <strong>{dest.capital}</strong></>}
+                  {dest.capital && dest.currency && ' · '}
+                  {dest.currency && <>Currency: <strong>{dest.currency}</strong></>}
+                </p>
+              )}
+              <span className={`status-badge status-${dest.status}`}>{dest.status}</span>
+              {dest.notes && <p className="card-notes">📝 {dest.notes}</p>}
+              <p className="card-date">Added: {new Date(dest.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+              <div className="card-actions">
+                <button className="btn-edit" onClick={() => setEditing(dest)}>Edit</button>
+                <button className="btn-delete" onClick={() => deleteDestination(dest.id)}>Delete</button>
+              </div>
             </>
           )}
         </div>

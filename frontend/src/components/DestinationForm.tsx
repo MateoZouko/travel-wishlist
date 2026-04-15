@@ -29,7 +29,7 @@ const DestinationForm: React.FC<Props> = ({ existing, onDone }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '400px' }}>
+    <form onSubmit={handleSubmit} className="destination-form">
       <input
         placeholder="Destination name"
         value={name}
@@ -43,7 +43,7 @@ const DestinationForm: React.FC<Props> = ({ existing, onDone }) => {
         required
       />
       <textarea
-        placeholder="Notes"
+        placeholder="Notes (optional)"
         value={notes}
         onChange={e => setNotes(e.target.value)}
       />
@@ -52,7 +52,7 @@ const DestinationForm: React.FC<Props> = ({ existing, onDone }) => {
         <option value="planned">Planned</option>
         <option value="visited">Visited</option>
       </select>
-      <button type="submit">{existing ? 'Update' : 'Add Destination'}</button>
+      <button type="submit">{existing ? 'Update Destination' : 'Add Destination'}</button>
     </form>
   );
 };

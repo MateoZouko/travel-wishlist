@@ -1,18 +1,15 @@
-import React from 'react';
 import { DestinationProvider } from './context/DestinationContext';
 import DestinationForm from './components/DestinationForm';
 import DestinationList from './components/DestinationList';
-import ISSTracker from './components/ISSTracker';
 
 function App() {
   return (
     <DestinationProvider>
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '24px' }}>
-        <h1>✈️ Travel Wishlist</h1>
-        <ISSTracker />
-        <h2>Add New Destination</h2>
+      <div style={{ maxWidth: '760px', margin: '0 auto', padding: '32px 24px' }}>
+        <h1 style={{ marginBottom: '24px', fontSize: '28px' }}>✈️ Travel Wishlist</h1>
+        <h2 style={{ marginBottom: '12px', fontSize: '18px' }}>Add New Destination</h2>
         <DestinationForm />
-        <hr style={{ margin: '24px 0' }} />
+        <h2 style={{ margin: '32px 0 12px', fontSize: '18px' }}>My Destinations</h2>
         <DestinationList />
       </div>
     </DestinationProvider>

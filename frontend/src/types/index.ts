@@ -5,10 +5,7 @@ export interface Destination {
   notes: string;
   status: 'wishlist' | 'visited' | 'planned';
   created_at: string;
-}
-
-export interface ISSPosition {
-  latitude: number;
-  longitude: number;
-  timestamp: number;
+  capital?: string;
+  currency?: string;
+  flag_url?: string;
 }
