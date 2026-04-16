@@ -28,6 +28,12 @@ def init_db():
             currency VARCHAR(10),
             flag_url TEXT
         );
+
+        CREATE OR REPLACE FUNCTION delete_destination(p_id INT) RETURNS VOID AS $$
+        BEGIN
+            DELETE FROM destinations WHERE id = p_id;
+        END;
+        $$ LANGUAGE plpgsql;
     """)
     conn.commit()
     cur.close()

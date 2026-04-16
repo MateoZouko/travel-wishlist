@@ -148,6 +148,54 @@ Base URL (production): `https://d275jdcunrc9qo.cloudfront.net/api`
 
 ---
 
+## Testing
+
+### Backend unit tests
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python -m pytest tests/ -v
+```
+
+All endpoints are covered with mocked database connections:
+- `GET /api/destinations` — empty list and populated list
+- `GET /api/destinations/:id` — found and not found
+- `POST /api/destinations` — successful creation
+- `PUT /api/destinations/:id` — successful update and not found
+- `DELETE /api/destinations/:id` — successful deletion
+- `GET /health` — health check
+- `enrich_with_country_data` — fallback on external API failure
+
+### Manual API testing
+
+With the app running locally (`docker compose up --build`):
+
+```bash
+# Create a destination
+curl -s -X POST http://localhost:5000/api/destinations \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Tokyo", "country": "Japan", "notes": "Visit in spring", "status": "wishlist"}'
+
+# List all destinations
+curl -s http://localhost:5000/api/destinations
+
+# Update a destination
+curl -s -X PUT http://localhost:5000/api/destinations/1 \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Tokyo", "country": "Japan", "notes": "Updated notes", "status": "planned"}'
+
+# Delete a destination
+curl -s -X DELETE http://localhost:5000/api/destinations/1
+
+# Health check
+curl -s http://localhost:5000/health
+```
+
+---
+
 ## AWS Deployment
 
 ### Prerequisites
