@@ -9,10 +9,23 @@ A full-stack 3-tier web application to manage travel destinations.
 ## Features
 
 - **CRUD** — Create, read, update and delete travel destinations
-- **State Management** — React Context API for global state
+- **State Management** — React Context API for global state across list view, map view, filters and search
 - **External API** — RestCountries API enriches each destination with capital city, currency and country flag
 - **PostgreSQL** — Data persisted using raw SQL and stored procedures (no ORM)
 - **AWS Deployment** — Follows the 6 pillars of the AWS Well-Architected Framework
+
+### Frontend
+- **List view** — destination cards with flag, capital, currency and status badge
+- **Map view** — interactive world map (CartoDB tiles) with color-coded pins by status, side panel and fly-to animation on click
+- **Filter tabs** — filter by All / Wishlist / Planned / Visited
+- **Search** — real-time search by destination name or country
+- **Sort** — by date added, name or status
+- **Progress bar** — tracks % of destinations visited
+- **Stats bar** — live counts per status
+- **Mark as visited** — one-click status update directly from the card
+- **Toast notifications** — feedback on every CRUD operation
+- **Dark mode** — toggle with localStorage persistence
+- **Animations** — cards fade in on load, hover shadow effect
 
 ---
 
