@@ -68,7 +68,7 @@ def get_destination(id):
         'flag_url': row[8]
     })
 
-# Create destination usando stored procedure + RestCountries
+# Create destination with RestCountries enrichment
 @destinations_bp.route('/destinations', methods=['POST'])
 def create_destination():
     data = request.get_json()
